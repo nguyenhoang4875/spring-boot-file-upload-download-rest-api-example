@@ -2,6 +2,7 @@ package com.example.filedemo.controller;
 
 import com.example.filedemo.payload.UploadFileResponse;
 import com.example.filedemo.service.FileStorageService;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,4 +74,11 @@ public class FileController {
                 .body(resource);
     }
 
+    @GetMapping(value = "/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getFile(@PathVariable String name) throws IOException {
+        // Load file as Resource
+        Resource resource = fileStorageService.loadFileAsResource(name);
+        InputStream inputStream = resource.getInputStream();
+        return ResponseEntity.ok().body(IOUtils.toByteArray(inputStream));
+    }
 }
